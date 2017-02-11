@@ -19,21 +19,11 @@ internal void RenderStuff(game_screen_buffer *Buffer,
 global_variable int32 WorldWidth = 20;
 global_variable int32 WorldHeight = 20;
 
-struct game_state
-{
-    int32 BlockSize;
-    int32 *WorldBuffer;
-    
-};
 
 extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
-    game_state *GameState = (game_state *)Memory;
-    if(!Memory->IsInit)
-    {
-        GameState->BlockSize = 20;
-        Memory->IsInit = true;
-    }
+
+    local_persist int32 BlockSize = 20;
     
     uint8 World[20 * 20];
     for(int32 i = 0; i < WorldHeight; i++)
@@ -51,7 +41,29 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         }
     }
     
-    Assert("hello");
+    uint8 *Row = Buffer->Memory;
+    for(uint32 Y = 0; Y < Buffer->Height; Y++)
+    {
+        int32 YOffSet = (int32)(Y / BlockSize);
+        uint32 *Pixel = (uint32 *)Row;
+        for(uint32 X = 0; X < Buffer->Width; X++)
+        {
+            int32 XOffSet = (int32)(X / BlockSize);
+            
+            uint8 chars = World[(WorldHeight * YOffSet) + XOffSet];
+            if(chars == 'A')
+            {
+                *Pixel = (255 << 16);
+            }
+            else if(chars == 'B')
+            {
+                *Pixel = 255;
+            }
+            Pixel++;
+        }
+        Row += Buffer->Pitch;
+    }    
+    Assert("This line is using for only the debugger");
     
     //RenderStuff(Buffer, Color.Red, Color.Green, Color.Blue);
 }

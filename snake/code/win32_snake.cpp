@@ -490,6 +490,7 @@ WinMain(HINSTANCE Instance,
             GameMemory.Storage = VirtualAlloc(BaseAddress, GameMemory.StorageSize, 
                                               MEM_COMMIT|MEM_RESERVE, 
                                               PAGE_READWRITE);
+            GameMemory.IsInit = false;
             if(GameMemory.Storage)
             {
                 win32_game_mode Game = Win32LoadGameCode(SourceGameDLLFilePath, TempGameDLLFilePath);
