@@ -40,7 +40,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
             }             
         }
     }
-    
+#if 0
     uint8 *Row = Buffer->Memory;
     for(uint32 Y = 0; Y < Buffer->Height; Y++)
     {
@@ -62,9 +62,43 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
             Pixel++;
         }
         Row += Buffer->Pitch;
-    }    
+    }
+#else
+    uint8 *Row = Buffer->Memory;
+    for(uint32 Y = 0; Y < BlockSize; Y++)
+    {
+        uint32 *Pixel = (uint32 *)Row;
+        for(uint32 X = 0; X < BlockSize; X++)
+        {
+            *Pixel = (255 << 16);
+        }
+    }
+#endif
     Assert("This line is using for only the debugger");
     
     //RenderStuff(Buffer, Color.Red, Color.Green, Color.Blue);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
