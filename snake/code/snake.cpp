@@ -19,11 +19,10 @@ internal void RenderStuff(game_screen_buffer *Buffer,
 global_variable int32 WorldWidth = 20;
 global_variable int32 WorldHeight = 20;
 
-
 extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
-
-    local_persist int32 BlockSize = 20;
+    
+    local_persist int32 BlockSize = 36;
     
     uint8 World[20 * 20];
     for(int32 i = 0; i < WorldHeight; i++)
@@ -32,52 +31,51 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         {
             if(i % 2 == 0)
             {
-                World[(WorldHeight * i) + j] = 'A';   
+                World[(WorldWidth * i) + j] = 'A';   
             }
             else
             {
-                World[(WorldHeight * i) + j] = 'B';
+                World[(WorldWidth * i) + j] = 'B';
             }             
         }
     }
-#if 0
-    uint8 *Row = Buffer->Memory;
-    for(uint32 Y = 0; Y < Buffer->Height; Y++)
+    
+    for(uint8 RealY = 0; RealY < WorldHeight; RealY++)
     {
-        int32 YOffSet = (int32)(Y / BlockSize);
-        uint32 *Pixel = (uint32 *)Row;
-        for(uint32 X = 0; X < Buffer->Width; X++)
+        for(uint8 RealX = 0; RealX < WorldWidth; RealX++)
         {
-            int32 XOffSet = (int32)(X / BlockSize);
-            
-            uint8 chars = World[(WorldHeight * YOffSet) + XOffSet];
+            uint8 chars = World[(RealY * WorldWidth) + RealX];
+            uint32 Color;
             if(chars == 'A')
             {
-                *Pixel = (255 << 16);
+                Color = (255 << 16);
             }
-            else if(chars == 'B')
+            else
             {
-                *Pixel = 255;
+                Color = 255;
             }
-            Pixel++;
+            
+            uint32 XOffset = BlockSize * RealX;
+            uint32 YOffset = BlockSize * RealY;
+            
+            uint8 *Row = Buffer->Memory;
+            for(int y = 0; y < BlockSize; y++)
+            {
+                uint32 *Pixel = (uint32 *)Row + (YOffset * Buffer->Width) + XOffset;
+                for(int x = 0; x < BlockSize; x++)
+                {
+                    *Pixel++ = Color;
+                }
+                Row += Buffer->Pitch;
+            }
         }
-        Row += Buffer->Pitch;
     }
-#else
-    uint8 *Row = Buffer->Memory;
-    for(uint32 Y = 0; Y < BlockSize; Y++)
-    {
-        uint32 *Pixel = (uint32 *)Row;
-        for(uint32 X = 0; X < BlockSize; X++)
-        {
-            *Pixel = (255 << 16);
-        }
-    }
-#endif
+    
     Assert("This line is using for only the debugger");
     
     //RenderStuff(Buffer, Color.Red, Color.Green, Color.Blue);
 }
+
 
 
 
