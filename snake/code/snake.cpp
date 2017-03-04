@@ -1,4 +1,5 @@
 #include "snake_platform.h"
+#include "snake.h"
 
 internal void RenderStuff(game_screen_buffer *Buffer, 
                           uint8 Red, uint8 Green, uint8 Blue)
@@ -16,35 +17,47 @@ internal void RenderStuff(game_screen_buffer *Buffer,
     }
 }
 
-global_variable int32 WorldWidth = 20;
-global_variable int32 WorldHeight = 20;
+//global_variable int32 WorldWidth = 20;
+//global_variable int32 WorldHeight = 20;
 
 extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
+    //local_persist int32 BlockSize = 36;
     
-    local_persist int32 BlockSize = 36;
+    game_state *GameState = (game_state *) Memory->Storage;
+    
+    PushStruct(game_state);
+    
+    if(!Memory->IsInit)
+    {
+        GameState->WorldHeight = 20;
+        GameState->WorldWidth = 20;
+        GameState->BlockSize = 36;
+        
+        Memory->IsInit = true;
+    }
     
     uint8 World[20 * 20];
-    for(int32 i = 0; i < WorldHeight; i++)
+    for(int32 i = 0; i < GameState->WorldHeight; i++)
     {
-        for(int32 j = 0; j < WorldWidth; j++)
+        for(int32 j = 0; j < GameState->WorldWidth; j++)
         {
             if(i % 2 == 0)
             {
-                World[(WorldWidth * i) + j] = 'A';   
+                World[(GameState->WorldWidth * i) + j] = 'A';   
             }
             else
             {
-                World[(WorldWidth * i) + j] = 'B';
+                World[(GameState->WorldWidth * i) + j] = 'B';
             }             
         }
     }
     
-    for(uint8 RealY = 0; RealY < WorldHeight; RealY++)
+    for(uint8 RealY = 0; RealY < GameState->WorldHeight; RealY++)
     {
-        for(uint8 RealX = 0; RealX < WorldWidth; RealX++)
+        for(uint8 RealX = 0; RealX < GameState->WorldWidth; RealX++)
         {
-            uint8 chars = World[(RealY * WorldWidth) + RealX];
+            uint8 chars = World[(RealY * GameState->WorldWidth) + RealX];
             uint32 Color;
             if(chars == 'A')
             {
@@ -55,14 +68,14 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
                 Color = 255;
             }
             
-            uint32 XOffset = BlockSize * RealX;
-            uint32 YOffset = BlockSize * RealY;
+            uint32 XOffset = GameState->BlockSize * RealX;
+            uint32 YOffset = GameState->BlockSize * RealY;
             
             uint8 *Row = Buffer->Memory;
-            for(int y = 0; y < BlockSize; y++)
+            for(int y = 0; y < GameState->BlockSize; y++)
             {
                 uint32 *Pixel = (uint32 *)Row + (YOffset * Buffer->Width) + XOffset;
-                for(int x = 0; x < BlockSize; x++)
+                for(int x = 0; x < GameState->BlockSize; x++)
                 {
                     *Pixel++ = Color;
                 }

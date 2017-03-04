@@ -15,6 +15,7 @@ typedef uint64_t uint64;
 
 typedef float real32;
 typedef double real64;
+typedef size_t memory_index;
 
 #define global_variable static
 #define internal static
