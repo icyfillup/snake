@@ -2,7 +2,7 @@
 
 struct memory_arrangement
 {
-    memory_index *Base;
+    uint8 *Base;
     memory_index Used;
     memory_index Size;
 };
@@ -17,9 +17,11 @@ struct game_state
     int32 BlockSize;
 };
 
-void InitMemoryArrangement()
+void InitMemoryArrangement(memory_arrangement *MemoryArrangement, uint8 *Base, memory_index Size)
 {
-
+    MemoryArrangement->Base = Base;
+    MemoryArrangement->Size = Size;
+    MemoryArrangement->Used = 0;
 }
 
 #define SNAKE_H

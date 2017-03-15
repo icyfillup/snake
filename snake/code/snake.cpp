@@ -26,13 +26,15 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     
     game_state *GameState = (game_state *) Memory->Storage;
     
-    PushStruct(game_state);
+    //PushStruct(game_state);
     
     if(!Memory->IsInit)
     {
         GameState->WorldHeight = 20;
         GameState->WorldWidth = 20;
         GameState->BlockSize = 36;
+        
+        InitMemoryArrangement(&(GameState->MemoryArrangement), (uint8 *)Memory->Storage + sizeof(GameState), Memory->StorageSize - sizeof(GameState));
         
         Memory->IsInit = true;
     }
