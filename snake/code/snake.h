@@ -2,22 +2,40 @@
 
 struct memory_arrangement
 {
-    uint8 *Base;
     memory_index Used;
     memory_index Size;
+    uint8 *Base;
+};
+
+struct world
+{
+    int32 Width;
+    int32 Height;
+    int32 BlockSize;
 };
 
 struct game_state
 {
-    memory_arrangement MemoryArrangement; 
+    world *World;
     
+    /*
+    int32 BlockSize;
     int32 WorldWidth;
     int32 WorldHeight;
+    */
     
-    int32 BlockSize;
+    memory_arrangement MemoryArrangement; 
 };
 
-void InitMemoryArrangement(memory_arrangement *MemoryArrangement, uint8 *Base, memory_index Size)
+void * PushSize_(memory_arrangement *MemoryArrangement)
+{
+    
+    return Result;
+}
+
+void InitMemoryArrangement(memory_arrangement *MemoryArrangement, 
+                           uint8 *Base, 
+                           memory_index Size)
 {
     MemoryArrangement->Base = Base;
     MemoryArrangement->Size = Size;

@@ -30,14 +30,27 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     
     if(!Memory->IsInit)
     {
-        GameState->WorldHeight = 20;
-        GameState->WorldWidth = 20;
-        GameState->BlockSize = 36;
+        InitMemoryArrangement(&(GameState->MemoryArrangement), 
+                              (uint8 *)Memory->Storage + sizeof(GameState), 
+                              Memory->StorageSize - sizeof(GameState));
         
-        InitMemoryArrangement(&(GameState->MemoryArrangement), (uint8 *)Memory->Storage + sizeof(GameState), Memory->StorageSize - sizeof(GameState));
+        /*
+        GameState->WorldHeight = 0xFFFFFF;
+        GameState->WorldWidth = 0xFFFFFF;
+        GameState->BlockSize = 0xFFFFFF;
+        */
+        
+        PushStruct(GameState->MemoryArrangement);
+        GameState->World.Height = 20;
+        GameState->World.Width = 20;
+        GameState->World.BlockSize = 32;
+        
+        
         
         Memory->IsInit = true;
     }
+    
+#if 0
     
     uint8 World[20 * 20];
     for(int32 i = 0; i < GameState->WorldHeight; i++)
@@ -85,7 +98,55 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
             }
         }
     }
+#else
     
+    uint8 World[20 * 20];
+    for(int32 i = 0; i < GameState->World.Height; i++)
+    {
+        for(int32 j = 0; j < GameState->World.Width; j++)
+        {
+            if(i % 2 == 0)
+            {
+                World[(GameState->World.Width * i) + j] = 'A';   
+            }
+            else
+            {
+                World[(GameState->World.Width * i) + j] = 'B';
+            }             
+        }
+    }
+    
+    for(uint8 RealY = 0; RealY < GameState->World.Height; RealY++)
+    {
+        for(uint8 RealX = 0; RealX < GameState->World.Width; RealX++)
+        {
+            uint8 chars = World[(RealY * GameState->World.Width) + RealX];
+            uint32 Color;
+            if(chars == 'A')
+            {
+                Color = (255 << 16);
+            }
+            else
+            {
+                Color = 255;
+            }
+            
+            uint32 XOffset = GameState->World.BlockSize * RealX;
+            uint32 YOffset = GameState->World.BlockSize * RealY;
+            
+            uint8 *Row = Buffer->Memory;
+            for(int y = 0; y < GameState->World.BlockSize; y++)
+            {
+                uint32 *Pixel = (uint32 *)Row + (YOffset * Buffer->Width) + XOffset;
+                for(int x = 0; x < GameState->World.BlockSize; x++)
+                {
+                    *Pixel++ = Color;
+                }
+                Row += Buffer->Pitch;
+            }
+        }
+    }
+#endif
     Assert("This line is using for only the debugger");
     
     //RenderStuff(Buffer, Color.Red, Color.Green, Color.Blue);
