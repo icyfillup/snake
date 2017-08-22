@@ -46,10 +46,15 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         GameState->World->Width = 20;
         GameState->World->BlockSize = 32;
 
+        /*
         GameState->World->TileMap = 
             PushArray(&(GameState->MemoryArrangement), 
                       GameState->World->Height * GameState->World->Width, 
                       uint8);
+        */
+        
+        void *TileMap = PushSize_(&(GameState->MemoryArrangement), (GameState->World->Height * GameState->World->Width) * sizeof(uint8));
+        GameState->World->TileMap = (uint8 *)TileMap; 
         
         Memory->IsInit = true;
     }

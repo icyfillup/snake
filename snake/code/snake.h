@@ -1,5 +1,7 @@
 #if !defined(SNAKE_H)
 
+#include "snake_platform.h"
+
 struct memory_arrangement
 {
     memory_index Used;
@@ -28,14 +30,15 @@ struct game_state
 };
 
 
+#define PushArray(MemoryArrangement, Count, type) (type *)PushSize_(MemoryArrangement, (Count * sizeof(type)))
 #define PushStruct(MemoryArrangement, type) (type *)PushSize_(MemoryArrangement, sizeof(type))
-#define PushArray(MemoryArrangement, Count, type) (type *)PushSize_(MemoryArrangement, Count * sizeof(type))
-void * PushSize_(memory_arrangement *MemoryArrangement, memory_index Size)
+
+void *PushSize_(memory_arrangement *MemoryArrangement, memory_index Size)
 {
     Assert((MemoryArrangement->Used + Size) <= MemoryArrangement->Size);
     
     void *Result = MemoryArrangement->Base + MemoryArrangement->Used;
-    MemoryArrangement->Used = MemoryArrangement->Used + Size;
+    MemoryArrangement->Used += Size;
     
     return Result;
 }
