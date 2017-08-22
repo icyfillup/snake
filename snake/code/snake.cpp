@@ -35,24 +35,29 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
                               Memory->StorageSize - sizeof(GameState));
         
         /*
-        GameState->WorldHeight = 0xFFFFFF;
-        GameState->WorldWidth = 0xFFFFFF;
-        GameState->BlockSize = 0xFFFFFF;
+        GameState->WorldHeight = 20;
+        GameState->WorldWidth = 20;
+        GameState->BlockSize = 32;
         */
         
-        PushStruct(GameState->MemoryArrangement);
-        GameState->World.Height = 20;
-        GameState->World.Width = 20;
-        GameState->World.BlockSize = 32;
-        
-        
+        GameState->World = 
+            PushStruct(&GameState->MemoryArrangement, world);
+        GameState->World->Height = 20;
+        GameState->World->Width = 20;
+        GameState->World->BlockSize = 32;
+
+        GameState->World->TileMap = 
+            PushArray(&(GameState->MemoryArrangement), 
+                      GameState->World->Height * GameState->World->Width, 
+                      uint8);
         
         Memory->IsInit = true;
     }
+    memory_index Used = GameState->MemoryArrangement.Used;
     
 #if 0
-    
-    uint8 World[20 * 20];
+
+    uint8 *World = GameState->World->TileMap;
     for(int32 i = 0; i < GameState->WorldHeight; i++)
     {
         for(int32 j = 0; j < GameState->WorldWidth; j++)
@@ -99,28 +104,28 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         }
     }
 #else
-    
-    uint8 World[20 * 20];
-    for(int32 i = 0; i < GameState->World.Height; i++)
+
+    uint8 *World = GameState->World->TileMap;
+    for(int32 i = 0; i < GameState->World->Height; i++)
     {
-        for(int32 j = 0; j < GameState->World.Width; j++)
+        for(int32 j = 0; j < GameState->World->Width; j++)
         {
             if(i % 2 == 0)
             {
-                World[(GameState->World.Width * i) + j] = 'A';   
+                World[(GameState->World->Width * i) + j] = 'A';   
             }
             else
             {
-                World[(GameState->World.Width * i) + j] = 'B';
+                World[(GameState->World->Width * i) + j] = 'B';
             }             
         }
     }
     
-    for(uint8 RealY = 0; RealY < GameState->World.Height; RealY++)
+    for(uint8 RealY = 0; RealY < GameState->World->Height; RealY++)
     {
-        for(uint8 RealX = 0; RealX < GameState->World.Width; RealX++)
+        for(uint8 RealX = 0; RealX < GameState->World->Width; RealX++)
         {
-            uint8 chars = World[(RealY * GameState->World.Width) + RealX];
+            uint8 chars = World[(RealY * GameState->World->Width) + RealX];
             uint32 Color;
             if(chars == 'A')
             {
@@ -131,14 +136,14 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
                 Color = 255;
             }
             
-            uint32 XOffset = GameState->World.BlockSize * RealX;
-            uint32 YOffset = GameState->World.BlockSize * RealY;
+            uint32 XOffset = GameState->World->BlockSize * RealX;
+            uint32 YOffset = GameState->World->BlockSize * RealY;
             
             uint8 *Row = Buffer->Memory;
-            for(int y = 0; y < GameState->World.BlockSize; y++)
+            for(int y = 0; y < GameState->World->BlockSize; y++)
             {
                 uint32 *Pixel = (uint32 *)Row + (YOffset * Buffer->Width) + XOffset;
-                for(int x = 0; x < GameState->World.BlockSize; x++)
+                for(int x = 0; x < GameState->World->BlockSize; x++)
                 {
                     *Pixel++ = Color;
                 }
