@@ -31,14 +31,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     if(!Memory->IsInit)
     {
         InitMemoryArrangement(&(GameState->MemoryArrangement), 
-                              (uint8 *)Memory->Storage + sizeof(GameState), 
-                              Memory->StorageSize - sizeof(GameState));
-        
-        /*
-        GameState->WorldHeight = 20;
-        GameState->WorldWidth = 20;
-        GameState->BlockSize = 32;
-        */
+                              (uint8 *)Memory->Storage + sizeof(game_state), 
+                              Memory->StorageSize - sizeof(game_state));
         
         GameState->World = 
             PushStruct(&GameState->MemoryArrangement, world);
@@ -46,15 +40,11 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         GameState->World->Width = 20;
         GameState->World->BlockSize = 32;
 
-        /*
+        
         GameState->World->TileMap = 
             PushArray(&(GameState->MemoryArrangement), 
                       GameState->World->Height * GameState->World->Width, 
                       uint8);
-        */
-        
-        void *TileMap = PushSize_(&(GameState->MemoryArrangement), (GameState->World->Height * GameState->World->Width) * sizeof(uint8));
-        GameState->World->TileMap = (uint8 *)TileMap; 
         
         Memory->IsInit = true;
     }
