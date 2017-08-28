@@ -18,6 +18,15 @@ struct world
     uint8 *TileMap;
 };
 
+struct screen
+{
+    int32 XOffset;
+    int32 YOffset;
+    
+    int32 Width;
+    int32 Height;
+};
+
 struct game_state
 {
     world *World;
