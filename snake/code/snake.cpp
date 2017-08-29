@@ -19,7 +19,8 @@ internal void RenderStuff(game_screen_buffer *Buffer,
 
 extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
-    //local_persist int32 BlockSize = 36;
+    local_persist uint8 GAME_WALL = 'w';
+    local_persist uint8 GAME_SPACE = 's';
     
     game_state *GameState = (game_state *) Memory->Storage;
     
@@ -32,9 +33,9 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
                               Memory->StorageSize - sizeof(game_state));
         
         GameState->World = PushStruct(&GameState->MemoryArrangement, world);
-        GameState->World->Height = 20;
+        GameState->World->Height = 21;
         GameState->World->Width = 38;
-        GameState->World->BlockSize = 16;
+        GameState->World->BlockSize = 33;
 
         GameState->World->TileMap = 
             PushArray(&GameState->MemoryArrangement, 
@@ -44,10 +45,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         Memory->IsInit = true;
     }
     
-    GameState->World->Height = 40;
-    GameState->World->Width = 70;
-    GameState->World->BlockSize = 16;
-    
     memory_index Used = GameState->MemoryArrangement.Used;
     
     uint8 *World = GameState->World->TileMap;
@@ -55,13 +52,14 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     {
         for(int32 j = 0; j < GameState->World->Width; j++)
         {
-            if(i % 2 == 0)
+            if(i == 0 || i == GameState->World->Height - 1 ||
+               j == 0 || j == GameState->World->Width - 1)
             {
-                World[(GameState->World->Width * i) + j] = 'A';   
+                World[(GameState->World->Width * i) + j] = 'w';   
             }
             else
             {
-                World[(GameState->World->Width * i) + j] = 'B';
+                World[(GameState->World->Width * i) + j] = 's';
             }             
         }
     }
@@ -73,13 +71,17 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
             uint8 chars = World[(RealY * GameState->World->Width) + RealX];
             uint32 Color;
             
-            if(chars == 'A')
+            if(chars == 'w')
             {
-                Color = (255 << 8);
+                Color = 255;
+            }
+            else if(chars == 's')
+            {
+                Color = (255 << 16) | (255 << 8) | 255;
             }
             else
             {
-                Color = 255;
+                Color = (255 << 16);
             }
             
             uint32 XOffset = GameState->World->BlockSize * RealX;
