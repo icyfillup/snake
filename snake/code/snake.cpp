@@ -17,9 +17,6 @@ internal void RenderStuff(game_screen_buffer *Buffer,
     }
 }
 
-//global_variable int32 WorldWidth = 20;
-//global_variable int32 WorldHeight = 20;
-
 extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
     //local_persist int32 BlockSize = 36;
@@ -34,72 +31,25 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
                               (uint8 *)Memory->Storage + sizeof(game_state), 
                               Memory->StorageSize - sizeof(game_state));
         
-        GameState->World = 
-            PushStruct(&GameState->MemoryArrangement, world);
+        GameState->World = PushStruct(&GameState->MemoryArrangement, world);
         GameState->World->Height = 20;
-        GameState->World->Width = 40;
-        GameState->World->BlockSize = 32;
+        GameState->World->Width = 38;
+        GameState->World->BlockSize = 16;
 
-        
         GameState->World->TileMap = 
-            PushArray(&(GameState->MemoryArrangement), 
+            PushArray(&GameState->MemoryArrangement, 
                       GameState->World->Height * GameState->World->Width, 
                       uint8);
         
         Memory->IsInit = true;
     }
+    
+    GameState->World->Height = 40;
+    GameState->World->Width = 70;
+    GameState->World->BlockSize = 16;
+    
     memory_index Used = GameState->MemoryArrangement.Used;
     
-#if 0
-
-    uint8 *World = GameState->World->TileMap;
-    for(int32 i = 0; i < GameState->WorldHeight; i++)
-    {
-        for(int32 j = 0; j < GameState->WorldWidth; j++)
-        {
-            if(i % 2 == 0)
-            {
-                World[(GameState->WorldWidth * i) + j] = 'A';   
-            }
-            else
-            {
-                World[(GameState->WorldWidth * i) + j] = 'B';
-            }             
-        }
-    }
-    
-    for(uint8 RealY = 0; RealY < GameState->WorldHeight; RealY++)
-    {
-        for(uint8 RealX = 0; RealX < GameState->WorldWidth; RealX++)
-        {
-            uint8 chars = World[(RealY * GameState->WorldWidth) + RealX];
-            uint32 Color;
-            if(chars == 'A')
-            {
-                Color = (255 << 16);
-            }
-            else
-            {
-                Color = 255;
-            }
-            
-            uint32 XOffset = GameState->BlockSize * RealX;
-            uint32 YOffset = GameState->BlockSize * RealY;
-            
-            uint8 *Row = Buffer->Memory;
-            for(int y = 0; y < GameState->BlockSize; y++)
-            {
-                uint32 *Pixel = (uint32 *)Row + (YOffset * Buffer->Width) + XOffset;
-                for(int x = 0; x < GameState->BlockSize; x++)
-                {
-                    *Pixel++ = Color;
-                }
-                Row += Buffer->Pitch;
-            }
-        }
-    }
-#else
-
     uint8 *World = GameState->World->TileMap;
     for(int32 i = 0; i < GameState->World->Height; i++)
     {
@@ -122,9 +72,10 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         {
             uint8 chars = World[(RealY * GameState->World->Width) + RealX];
             uint32 Color;
+            
             if(chars == 'A')
             {
-                Color = (255 << 16);
+                Color = (255 << 8);
             }
             else
             {
@@ -144,9 +95,10 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
                 }
                 Row += Buffer->Pitch;
             }
+            
         }
     }
-#endif
+    
     Assert("This line is using for only the debugger");
     
     //RenderStuff(Buffer, Color.Red, Color.Green, Color.Blue);
