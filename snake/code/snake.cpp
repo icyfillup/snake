@@ -37,7 +37,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
         GameState->World = 
             PushStruct(&GameState->MemoryArrangement, world);
         GameState->World->Height = 20;
-        GameState->World->Width = 20;
+        GameState->World->Width = 40;
         GameState->World->BlockSize = 32;
 
         
